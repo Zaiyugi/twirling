@@ -50,9 +50,16 @@ CFLAGS = -g -O2 -D_THREAD_SAFE -pthread -std=c++0x
 OFLAGS = -c $(INCLUDES) 
 GLFLAGS = -lAntTweakBar -lGL -lglut -lGLU
 
+
+
 all: $(OBJS)
 	ar rv $(VR_LIB) $?
 	make gl
+
+$(OBJS): | $(OBJ_DIR)
+
+$(OBJ_DIR):
+	@mkdir -p build lib
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.C $(INCLUDE)/%.h
 	$(CXX) $< -Wall $(CFLAGS) $(OFLAGS) -o $@
@@ -67,5 +74,5 @@ print:
 	$@
 
 clean:
-	rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a launch
+	-rm $(OBJ_DIR)/*.o $(LIB_DIR)/*.a launch
 
