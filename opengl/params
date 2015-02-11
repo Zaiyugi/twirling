@@ -1,0 +1,9 @@
+Cube_dim 128
+Ball_dim 16
+Ball_Radius 0.25
+Timestep 0.025
+Drag 0.25
+COR 0.75
+COF 0.5
+Wind_Velocity 0 0 0
+Gravity 0 -9.8 0

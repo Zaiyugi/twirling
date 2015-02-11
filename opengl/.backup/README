@@ -1,0 +1,105 @@
+Name:	Zachary Shore
+Class: 	CPSC-619-001
+Date: 	September 9, 2012
+Hmwrk: 	Box Bounce
+
+Desc:
+	Creates a simulation of several balls bouncing in a box
+	Since a single ball seemed rather boring, I decided to try and simulate multiple balls
+	in the box at once. In adding the extra balls, I also tried to implement a system that
+	would allow for collisions between balls and allow for these collisions to be calculated
+	rapidly. 
+
+Features:
+	Systems implemented
+	To step the simulation, I used the timer callback function as part of OpenGL, 
+        together with a user-defined timestep used in the Euler-Cromer Method.
+        The time between simulation steps is 25 milliseconds.
+
+	For collisions between balls and the walls of the box, I used the first method discussed in class, 
+        not the general method for planes and spheres. Frictional Collisions are used as well.
+	The function that implements this is ballBoxCollision and is part of the Box3D class in local_classes.h
+
+	Note on box bottom collisions: Resting Contact has been implemented as two functions in Box3D
+	and Sphere, but does not appear to be working correctly. I tried working out the bug, but it seems to
+	be sketchy on when it works or doesn't work.
+
+	For collisions between two balls, I decided to use an Octree structure and Collision Pairs. The Octree
+	structure greatly increases the speed at which collision pairs can be found, while the usage of 
+	collision pairs decreases the total number of collision checks that need to be evaluated. 
+	The collision pairs are stored in a std::set and are run through each simulation step to determine 
+	if two balls have moved close enough to warrant a collision response. We allow for a max of 4 balls
+	per cell of the octree with a minimum of 2. For each ball in the cell, we create collision pairs
+	using the other balls in the cell, each pair of balls only being added to the set once.
+	All octree functions can be found in octree.h and the collision pair set is found in box_bounce.cpp
+
+	The sphere is generated at run-time by the program with a radius of 1. We scale and translate the sphere
+	to render each ball on the screen. Note: There are only points for one sphere, centered at the origin.
+	Each ball uses the same frame, just scaled, translated, and colored for the correct size, position and
+	color.
+	The sphere is generated in box_bounce.cpp, with the Sphere class being found in local_classes.h
+
+Files:
+	Parameter File
+	Defines the parameters for the scene
+	Layout:
+	Cube_Dim N		Side length of the box; Must be a power of 2
+	Ball_Dim N		Balls are generated in a cubic lattice with  N^3 balls
+	Ball_Radius N		Radius of all balls
+	Timestep N		Timer-step for Euler Method
+	Drag N			Amount of Drag; 0.0 - 1.0
+	COR N			Coefficient of Restitution
+	COF N			Coefficient of friction
+	Wind_velocity X Y Z	Wind velocity
+	Gravity			Gravity in each direction
+
+	A sample parameter file is provided: params
+
+	Materials File
+	Defines materials/colors for each ball
+	Each material is given its own ID based on its placement within the file.
+	A ball may reference this material ID to use the material's specific colors
+	At runtime, balls are given a valid, random material ID, excluding ID 0, to use
+        Within the file, materials may be created using the following syntax:
+
+	newmtl
+	Kd R G B A	Diffuse color; Range: 0.0 -> 1.0
+	Ka R G B A	Ambient color; Range: 0.0 -> 1.0
+	Ks R G B A	Specular color; Range: 0.0 -> 1.0
+	Ke R G B A	Emissive color; Range: 0.0 -> 1.0
+	Ns N		Shininess coefficient; Range: 0.0 -> 128.0
+	endmtl
+
+	For the walls of the box, they always use the first material in the file, Material ID 0
+	A sample material file is given: materials
+
+Compiling and running:
+	The makefile should be platform independent, and should work on both Linux and Mac
+	However, when building on one platform and then switching to the other, any .o files
+	may not work. So use 'make clean' to clear them.
+
+	To compile:
+			make
+
+	To run:
+			box_bounce <parameter file> <material file>
+
+	To run with sample files:
+			box_bounce params materials
+
+	Once the program is running, press 'p' to start and stop the simulation
+
+Controls for program:
+
+	Mouse:
+	Left mouse button rotates camera
+	Right mouse button zooms
+	Middle mouse button pans
+
+	Keyboard:
+	'r':	Switches rendering mode; Cycles through Fill -> Line -> Point
+	'o':	Displays the octree structure; press again to turn off
+	'p':	Starts and stops the simulation
+	'esc':	Close the program
+
+End README
